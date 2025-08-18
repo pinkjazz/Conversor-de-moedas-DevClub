@@ -120,3 +120,21 @@ font-weight: 700;
     width: 44px; /* ajuste conforme necessário */
     height: auto;
 }
+
+@media screen and (max-width: 500px) {
+  
+  
+  main {
+    width: 90%;
+    max-width: 100vw;
+    margin: 0 auto 20px;
+    padding: 24px 4vw 16px;
+  }
+
+  button {
+    width: 100%;
+    max-width: 100%;
+    margin: 15px auto 20px;
+  }
+}
+
