@@ -4,7 +4,7 @@ const fromCurrencySelect = document.getElementById("from-currency");
 const toCurrencySelect = document.getElementById("to-currency");
 
 
-function convertValues() {
+async function convertValues() {
     updateFromCurrencyBox();
     // Impede conversão se as moedas forem iguais
     if (fromCurrencySelect.value === toCurrencySelect.value) {
@@ -30,10 +30,8 @@ function convertValues() {
     const currencyValueToConvert = document.querySelector(".value-to-convert");
     const currencyValueConverted = document.querySelector(".value-converted");
 
-    const dolarToday = 5.40;
-    const euroToday = 6.32;
-    const libraToday = 7.32;
-    const bitcoinToday = 633959.95;
+    // Buscar cotações atualizadas
+    const { dolarToday, euroToday, libraToday, bitcoinToday } = await getExchangeRates();
 
     // Exibe o valor de entrada na moeda de origem
     let fromLabel = '';
@@ -166,5 +164,27 @@ function updateFromCurrencyBox() {
 }
 
 currencySelect.addEventListener("change", changeCurrency);
-convertButton.addEventListener("click", convertValues);
+convertButton.addEventListener("click", async () => { await convertValues(); });
 fromCurrencySelect.addEventListener('change', updateFromCurrencyBox);
+
+// Função para buscar a cotação atual de cada moeda em relação ao real
+async function getExchangeRates() {
+    const urls = {
+        USD: 'https://economia.awesomeapi.com.br/json/last/USD-BRL',
+        EUR: 'https://economia.awesomeapi.com.br/json/last/EUR-BRL',
+        GBP: 'https://economia.awesomeapi.com.br/json/last/GBP-BRL',
+        BTC: 'https://economia.awesomeapi.com.br/json/last/BTC-BRL'
+    };
+    const results = await Promise.all([
+        fetch(urls.USD).then(r => r.json()),
+        fetch(urls.EUR).then(r => r.json()),
+        fetch(urls.GBP).then(r => r.json()),
+        fetch(urls.BTC).then(r => r.json())
+    ]);
+    return {
+        dolarToday: parseFloat(results[0].USDBRL.bid),
+        euroToday: parseFloat(results[1].EURBRL.bid),
+        libraToday: parseFloat(results[2].GBPBRL.bid),
+        bitcoinToday: parseFloat(results[3].BTCBRL.bid)
+    };
+}
